@@ -10,15 +10,15 @@ export default function HeroReboot() {
       
       {/* Texture de fond */}
       <img 
-        src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600" 
+        src="https://images.unsplash.com/photo-1599814812367-915c33dacd61?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
         alt="Les Abattoirs Toulouse" 
-        className="absolute inset-0 z-0 w-full h-full object-cover object-center opacity-50 pointer-events-none select-none"
+        className="absolute inset-0 z-0 w-full h-full object-cover object-center opacity-100 pointer-events-none select-none"
       />
       
       {/* Overlays de contraste */}
       <div className="absolute inset-0 z-10 bg-black/40 pointer-events-none" />
-      <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/80 via-black/10 to-black/80 pointer-events-none" />
-      <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/60 via-transparent to-black pointer-events-none" />
+      <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/10 via-black/10 to-black/80 pointer-events-none" />
+      <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/10 via-transparent to-black pointer-events-none" />
 
       <div className="relative z-20 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center -mt-10">
         

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image"; // Ajout de l'import Image
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,8 +33,19 @@ export default function Header() {
       <header className="fixed top-0 left-0 w-full z-50 bg-[#000000] border-b border-white/5 backdrop-blur-md bg-black/90">
         <div className="flex items-center justify-between px-6 py-3.5 md:px-12 max-w-7xl mx-auto">
           
-          <Link href="/" className="font-outfit font-bold text-xl tracking-tighter text-white select-none">
-            <span className="text-action-neon">A</span>BATTOIRS
+          {/* LOGO PC & MOBILE AVEC ANIMATION */}
+          <Link 
+            href="/" 
+            className="select-none inline-block origin-left hover:scale-105 transition-transform duration-300"
+          >
+            <Image 
+              src="/logo.png" 
+              alt="Les Abattoirs" 
+              width={160} 
+              height={36} 
+              priority
+              className="h-9 md:h-10 w-auto object-contain"
+            />
           </Link>
 
           {/* Navigation PC : Liens fins, serrés et 100% interactifs au survol */}
@@ -57,7 +69,7 @@ export default function Header() {
             className="md:hidden text-white hover:text-action-neon active:text-action-neon p-1 transition-colors" 
             onClick={() => setIsOpen(true)}
           >
-            <Menu className="w-6 h-6" />
+            <Menu className="w-7 h-7" />
           </button>
         </div>
       </header>
@@ -72,16 +84,22 @@ export default function Header() {
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="fixed inset-0 bg-[#000000] z-[999] flex flex-col px-6 py-4 h-[100dvh]"
           >
-            {/* Header Drawer */}
+            {/* Header Drawer avec Logo */}
             <div className="flex justify-between items-center py-1">
-              <span className="font-outfit font-bold text-xl tracking-tighter text-white">
-                <span className="text-action-neon">A</span>BATTOIRS
-              </span>
+              <Link href="/" onClick={() => setIsOpen(false)} className="inline-block origin-left hover:scale-105 transition-transform duration-300">
+                <Image 
+                  src="/logo.png" 
+                  alt="Les Abattoirs" 
+                  width={150} 
+                  height={32} 
+                  className="h-9 w-auto object-contain"
+                />
+              </Link>
               <button 
                 onClick={() => setIsOpen(false)} 
                 className="text-white hover:text-action-neon active:text-action-neon p-1 transition-colors"
               >
-                <X className="w-7 h-7" />
+                <X className="w-8 h-8" />
               </button>
             </div>
             
