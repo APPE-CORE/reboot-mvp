@@ -6,7 +6,7 @@ const ITEMS = [
   {
     title: "La Nef & L'Impact Brut",
     catalogue: "Inv. 2000.4.1",
-    desc: "Les peintures monumentales des années 1950 à nos jours servent de confrontation directe avec la nuit[cite: 1]. L'éclairage architectural rasant révèle les textures de briques et les pigments bruts.",
+    desc: "Les peintures monumentales des années 1950 à nos jours servent de confrontation directe avec la nuit. L'éclairage architectural rasant révèle les textures de briques et les pigments bruts.",
     img: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=800"
   },
   {
@@ -44,8 +44,6 @@ export default function CollectionsReboot() {
             const isEven = index % 2 === 1;
             return (
               <div key={index} className="grid grid-cols-12 gap-12 items-center">
-                
-                {/* Image couleur native sans filtre de gris */}
                 <div className={`col-span-7 overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 aspect-[16/10] group cursor-pointer ${isEven ? "md:order-last" : ""}`}>
                   <img 
                     src={item.img} 
@@ -63,7 +61,6 @@ export default function CollectionsReboot() {
                     {item.desc}
                   </p>
                 </div>
-
               </div>
             );
           })}
@@ -76,7 +73,6 @@ export default function CollectionsReboot() {
               key={index} 
               className="w-[85vw] shrink-0 snap-start flex flex-col gap-4 bg-[#050505] border border-white/10 p-5 rounded-2xl active:border-action-neon transition-colors duration-150"
             >
-              {/* Image couleur native pour mobile */}
               <div className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-neutral-900 border border-white/5">
                 <img src={item.img} alt={item.title} className="w-full h-full object-cover opacity-95" />
               </div>

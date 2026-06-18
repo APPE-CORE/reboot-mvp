@@ -7,27 +7,27 @@ const PROTOCOLS = [
     type: "TIMELINE",
     title: "Le Déroulement",
     items: [
-      { label: "21H00", detail: "Ouverture du parvis principal et activation des structures[cite: 1]." },
-      { label: "23H30", detail: "Fermeture définitive des portes d'accès à la nef centrale[cite: 1]." },
-      { label: "03H00", detail: "Fin de la diffusion sonore, évacuation et fermeture du site[cite: 1]." }
+      { label: "20H00", detail: "Ouverture des grilles, parvis principal et activation des structures de la nef." },
+      { label: "23H30", detail: "Fermeture définitive des portes d'accès pour des raisons de contrôle d'œuvres." },
+      { label: "02H30", detail: "Fin de la diffusion sonore, évacuation des collections et clôture du site." }
     ]
   },
   {
     type: "MANDATORY",
     title: "Obligations Strictes",
     items: [
-      { label: "Pastille", detail: "Application d'un opercule opaque sur l'objectif des téléphones à l'entrée[cite: 1]." },
-      { label: "Vestiaire", detail: "Dépôt obligatoire et sécurisé des sacs et effets volumineux inclus[cite: 1]." },
-      { label: "Identité", detail: "Présentation d'un titre valide pour le contrôle des billets nominatifs[cite: 1]." }
+      { label: "Pastille", detail: "Application d'un opercule opaque sur l'objectif des téléphones à l'entrée." },
+      { label: "Vestiaire", detail: "Dépôt obligatoire et sécurisé des sacs et effets volumineux inclus." },
+      { label: "Identité", detail: "Présentation d'un titre valide pour le contrôle des billets nominatifs." }
     ]
   },
   {
     type: "FORBIDDEN",
     title: "Interdictions",
     items: [
-      { label: "Captation", detail: "Aucune vidéo ou photographie au flash autorisée au sein des collections[cite: 1]." },
-      { label: "Vente In Situ", detail: "Aucun guichet de billetterie physique ne sera opéré le soir de l'événement[cite: 1]." },
-      { label: "Contact", detail: "Franchissement des lignes de sécurité entourant les œuvres d'art contemporain[cite: 1]." }
+      { label: "Captation", detail: "Aucune vidéo ou photographie au flash autorisée au sein des collections." },
+      { label: "Vente In Situ", detail: "Aucun guichet de billetterie physique ne sera opéré le soir de l'événement." },
+      { label: "Contact", detail: "Franchissement des lignes de sécurité entourant les œuvres d'art contemporain." }
     ]
   }
 ];
@@ -46,7 +46,6 @@ export default function LogisticsReboot() {
           </h2>
         </div>
 
-        {/* BLOCS DE SIGNALÉTIQUE INTERACTIFS */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           {PROTOCOLS.map((block, index) => (
             <motion.div 
@@ -54,7 +53,6 @@ export default function LogisticsReboot() {
               whileHover={{ borderColor: "rgba(255,255,255,0.2)" }}
               className="bg-[#050505] border border-white/5 rounded-2xl p-6 flex flex-col gap-6 transition-all duration-200"
             >
-              {/* En-tête du panneau de signalisation */}
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
                 <h3 className="font-outfit text-lg font-medium text-white">{block.title}</h3>
                 <span className={`font-mono text-[9px] px-2 py-0.5 rounded font-bold ${
@@ -66,7 +64,6 @@ export default function LogisticsReboot() {
                 </span>
               </div>
 
-              {/* Liste d'éléments type cartel de musée */}
               <div className="flex flex-col gap-4">
                 {block.items.map((item, i) => (
                   <motion.div 
@@ -83,14 +80,12 @@ export default function LogisticsReboot() {
                   </motion.div>
                 ))}
               </div>
-
             </motion.div>
           ))}
         </div>
 
-        {/* Rappel juridique de clôture */}
         <p className="font-inter text-[11px] text-white/30 text-center max-w-xl mx-auto leading-relaxed">
-          L'accès à l'établissement implique l'acceptation pleine et entière du règlement intérieur spécifique de l'événement REBOOT[cite: 1]. Les équipes de sécurité se réservent le droit d'admission[cite: 1].
+          L'accès à l'établissement implique l'acceptation pleine et entière du règlement intérieur spécifique de l'événement REBOOT. Les équipes de sécurité se réservent le droit d'admission.
         </p>
 
       </div>

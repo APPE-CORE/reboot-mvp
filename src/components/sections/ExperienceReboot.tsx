@@ -13,14 +13,14 @@ const CARDS = [
   {
     num: "02",
     title: "Curations Electroniques",
-    desc: "Un line-up sonore tenu secret jusqu'à l'ouverture des portes, calibré pour entrer en résonance avec la matérialité brute du lieu[cite: 1].",
+    desc: "Un line-up sonore tenu secret jusqu'à l'ouverture des portes, calibré pour entrer en résonance avec la matérialité brute du lieu.",
     img: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=800",
     accent: "hover:border-action-laser active:border-action-laser group-hover:text-action-laser"
   },
   {
     num: "03",
     title: "Mixologie & Terroir",
-    desc: "Bars éphémères approvisionnés en circuit court par les brasseries et vignerons artisanaux de la scène toulousaine[cite: 1].",
+    desc: "Bars éphémères approvisionnés en circuit court par les brasseries et vignerons artisanaux de la scène toulousaine.",
     img: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=800",
     accent: "hover:border-action-neon active:border-action-neon group-hover:text-action-neon"
   }
@@ -48,7 +48,6 @@ export default function ExperienceReboot() {
               whileTap={{ scale: 0.98 }}
               className={`bg-[#050505] border border-white/10 rounded-2xl overflow-hidden flex flex-col justify-between group transition-all duration-200 cursor-pointer ${card.accent}`}
             >
-              {/* Image en couleur par défaut avec ajustement d'opacité dynamique */}
               <div className="relative h-64 w-full overflow-hidden border-b border-white/5 bg-neutral-900">
                 <img 
                   src={card.img} 

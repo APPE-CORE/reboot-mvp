@@ -7,24 +7,22 @@ export default function HeroReboot() {
   return (
     <section className="relative w-full min-h-[90vh] flex items-center justify-center pt-14 md:pt-16 pb-12 px-6 md:px-12 lg:px-24 overflow-hidden bg-[#000000]">
       
-      {/* TEXTURE ARCHITECTURALE : Opacité augmentée pour révéler les détails */}
+      {/* Texture d'arrière-plan en couleur native */}
       <img 
         src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600" 
         alt="Les Abattoirs Architecture" 
         className="absolute inset-0 z-0 w-full h-full object-cover object-center opacity-55 pointer-events-none select-none transition-opacity duration-300"
       />
       
-      {/* SYSTÈME DE FILTRES AJUSTÉ : Centre dégagé, bords assombris pour maintenir le contraste CRO */}
+      {/* Filtres de contraste de l'écriture */}
       <div className="absolute inset-0 z-10 bg-black/40 pointer-events-none" />
       <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/80 via-black/10 to-black/80 pointer-events-none" />
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/60 via-transparent to-black pointer-events-none" />
 
       <div className="relative z-20 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center -mt-10">
         
-        {/* COLONNE GAUCHE : L'ACCROCHE ÉDITORIALE */}
+        {/* Accroche Éditoriale */}
         <div className="lg:col-span-7 flex flex-col items-start">
-          
-          {/* Badge d'ancrage institutionnel */}
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -37,7 +35,6 @@ export default function HeroReboot() {
             </span>
           </motion.div>
 
-          {/* Titre Impactant */}
           <motion.h1 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -48,7 +45,6 @@ export default function HeroReboot() {
             rencontre <span className="font-bold text-action-neon select-none">la nuit.</span>
           </motion.h1>
 
-          {/* Descriptif d'action */}
           <motion.p 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -59,7 +55,7 @@ export default function HeroReboot() {
           </motion.p>
         </div>
 
-        {/* COLONNE DROITE : LE MOTEUR DE CONVERSION */}
+        {/* Module d'Achat Exclusif */}
         <div className="lg:col-span-5 w-full">
           <motion.div 
             initial={{ opacity: 0, scale: 0.98 }}
@@ -74,9 +70,7 @@ export default function HeroReboot() {
               <h2 className="font-outfit text-2xl font-medium text-white mt-1">Accès Limité</h2>
             </div>
 
-            {/* Grille d'indicateurs de rareté */}
             <div className="flex flex-col gap-4">
-              
               <div className="flex items-start gap-3.5 bg-white/[0.02] border border-white/5 p-3 rounded-xl">
                 <Users className="w-5 h-5 text-white/80 shrink-0 mt-0.5" />
                 <div className="flex flex-col">
@@ -106,13 +100,11 @@ export default function HeroReboot() {
                   </span>
                 </div>
               </div>
-
             </div>
 
             <div className="text-[10px] font-mono text-white/40 uppercase tracking-wider text-center pt-2">
               Délivrance immédiate du billet • format wallet & qr code
             </div>
-
           </motion.div>
         </div>
 
