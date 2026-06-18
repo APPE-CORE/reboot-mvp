@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Ticket, CreditCard, CheckCircle, User, Mail, Sparkles, AlertTriangle, Download, ArrowRight, Calendar, MapPin, QrCode, ShieldCheck, Eye, Lock, Fingerprint, ChevronRight } from "lucide-react";
+import { Ticket, CreditCard, CheckCircle, User, Mail, Sparkles, AlertTriangle, Download, ArrowRight, Calendar, MapPin, QrCode, ShieldCheck, Eye, Lock, Fingerprint, ChevronRight, Clock } from "lucide-react";
 import Link from "next/link";
 
 export default function BilletterieCheckout() {
@@ -14,7 +14,12 @@ export default function BilletterieCheckout() {
   const [lastName, setLastName] = useState("");
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [formError, setFormError] = useState("");
+  
+  // Module de temporisation du panier (CRO / Scarcity Benchmark)
+  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes en secondes
+  const [isCartExpired, setIsCartExpired] = useState(false);
   
   // Interfaçage Pass Culture 
   const [passCultureCode, setPassCultureCode] = useState("");
@@ -28,14 +33,39 @@ export default function BilletterieCheckout() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [orderId, setOrderId] = useState("");
 
-  // Ajustement automatique de la ligne de flottaison au succès
+  // Gestion du compte à rebours
+  useEffect(() => {
+    if (isSuccess || isCartExpired) return;
+    
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setIsCartExpired(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isSuccess, isCartExpired]);
+
+  // Retour en haut de page fluide lors du passage au succès
   useEffect(() => {
     if (isSuccess) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [isSuccess]);
 
-  // Calcul mathématique des tarifs
+  // Formatage du temps
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
+
+  // Calculs tarifaires
   const UNIT_PRICE = productType === "standard" ? 20.00 : 15.00; 
   const multiplier = productType === "tribu" ? 4 : 1; 
   const rawTotal = UNIT_PRICE * ticketQty * multiplier;
@@ -66,7 +96,12 @@ export default function BilletterieCheckout() {
     }
 
     if (!email.includes("@") || !email.includes(".")) {
-      setFormError("Adresse e-mail invalide. Vérifiez la saisie.");
+      setFormError("Adresse e-mail invalide.");
+      return;
+    }
+
+    if (!acceptTerms) {
+      setFormError("Vous devez accepter le protocole de sécurité et le règlement intérieur de l'établissement.");
       return;
     }
 
@@ -97,18 +132,39 @@ export default function BilletterieCheckout() {
   };
 
   // ==========================================
-  // VUE SUCCÈS : PASS DE LA NEF REBOOT
+  // VUE ÉCRAN EXPIRÉ (RÉSERVATION PERDUE)
+  // ==========================================
+  if (isCartExpired) {
+    return (
+      <div className="min-h-screen bg-[#000000] flex items-center justify-center px-4 py-24">
+        <div className="w-full max-w-md bg-[#050505] border border-white/10 rounded-2xl p-8 text-center flex flex-col items-center gap-5">
+          <div className="w-12 h-12 bg-red-950/30 border border-red-900 text-red-400 rounded-full flex items-center justify-center">
+            <Clock className="w-6 h-6" />
+          </div>
+          <h2 className="font-outfit text-xl font-medium text-white">Session Expirée</h2>
+          <p className="font-inter text-xs text-white/60 leading-relaxed">
+            Afin de libérer les places pour les autres participants face à la régulation stricte de la jauge ERP, vos accès temporaires ont été remis en circulation.
+          </p>
+          <button 
+            onClick={() => { setIsCartExpired(false); setTimeLeft(600); }}
+            className="w-full bg-white text-black py-3 rounded-xl font-inter font-bold text-xs uppercase tracking-wider transition-colors hover:bg-action-neon"
+          >
+            Réinitialiser mon panier
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // VUE SUCCÈS : DIGITAL PASS WALLET
   // ==========================================
   if (isSuccess) {
     return (
       <div className="min-h-screen bg-[#000000] flex items-center justify-center px-4 sm:px-6 py-16 relative overflow-hidden">
         <div className="absolute inset-0 z-0 opacity-5 pointer-events-none bg-[url('https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?q=80&w=1600')] bg-cover bg-center" />
         
-        <motion.div 
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-lg z-10 flex flex-col gap-6"
-        >
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-lg z-10 flex flex-col gap-6">
           <div className="flex items-center gap-4 bg-white/[0.02] border border-white/10 p-4 rounded-2xl backdrop-blur-md">
             <div className="w-10 h-10 bg-action-neon/10 border border-action-neon/30 rounded-full flex items-center justify-center text-action-neon shrink-0">
               <CheckCircle className="w-5 h-5" />
@@ -182,16 +238,11 @@ export default function BilletterieCheckout() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 w-full">
-            <button
-              onClick={() => alert("Pass REBOOT ajouté avec succès à votre Wallet.")}
-              className="flex-1 bg-white hover:bg-neutral-200 text-black py-3 rounded-xl font-inter font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors select-none"
-            >
-              <Download className="w-4 h-4" />
-              Ajouter au Wallet
+            <button onClick={() => alert("Pass REBOOT ajouté avec succès.")} className="flex-1 bg-white hover:bg-neutral-200 text-black py-3 rounded-xl font-inter font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors select-none">
+              <Download className="w-4 h-4" /> Ajouter au Wallet
             </button>
             <Link href="/" className="flex-1 border border-white/20 hover:border-action-neon text-white hover:text-action-neon py-3 rounded-xl font-inter font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors select-none">
-              Quitter le tunnel
-              <ArrowRight className="w-4 h-4" />
+              Quitter le tunnel <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </motion.div>
@@ -199,21 +250,27 @@ export default function BilletterieCheckout() {
     );
   }
 
-  // ==========================================
-  // INTERFACE PRINCIPALE DE TRANSACTION
-  // ==========================================
   return (
     <div className="min-h-screen bg-[#000000] text-white pt-20 md:pt-12 pb-16 px-4 sm:px-6 md:px-12 lg:px-24">
       <div className="max-w-6xl mx-auto">
         
-        {/* TITRE EXCLUSIF DE LA SECTION */}
-        <div className="flex flex-col items-start mb-8 border-b border-white/5 pb-5">
-          <span className="font-montserrat text-action-neon font-bold tracking-[0.2em] uppercase text-[10px] mb-2">
-            06 — Billetterie Officielle
-          </span>
-          <h1 className="font-outfit text-2xl md:text-3xl font-light text-white tracking-tight">
-            Finaliser votre <span className="font-medium italic">réservation.</span>
-          </h1>
+        {/* EN-TÊTE DE LA PAGE */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 border-b border-white/5 pb-5">
+          <div className="flex flex-col items-start">
+            <span className="font-montserrat text-action-neon font-bold tracking-[0.2em] uppercase text-[10px] mb-2">
+              06 — Billetterie Officielle
+            </span>
+            <h1 className="font-outfit text-2xl md:text-3xl font-light text-white tracking-tight">
+              Finaliser votre <span className="font-medium italic">réservation.</span>
+            </h1>
+          </div>
+          
+          {/* COMPTE À REBOURS CRYPTIQUE (CRO ACCÉLÉRATEUR) */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-action-laser/10 border border-action-laser/30 self-start md:self-auto font-mono text-xs text-white">
+            <Clock className="w-4 h-4 text-action-laser animate-pulse" />
+            <span>Places réservées pendant :</span>
+            <span className="text-action-laser font-bold">{formatTime(timeLeft)}</span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -229,12 +286,7 @@ export default function BilletterieCheckout() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div 
-                  onClick={() => { setProductType("standard"); setTicketQty(1); }}
-                  className={`p-4 rounded-xl border cursor-pointer flex flex-col justify-between gap-4 transition-all duration-150 ${
-                    productType === "standard" ? "bg-white/[0.04] border-action-neon" : "bg-transparent border-white/10 hover:border-white/20"
-                  }`}
-                >
+                <div onClick={() => { setProductType("standard"); setTicketQty(1); }} className={`p-4 rounded-xl border cursor-pointer flex flex-col justify-between gap-4 transition-all duration-150 ${productType === "standard" ? "bg-white/[0.04] border-action-neon" : "bg-transparent border-white/10 hover:border-white/20"}`}>
                   <div className="flex flex-col">
                     <span className="font-outfit font-bold text-sm text-white">Entrée Individuelle</span>
                     <span className="font-inter text-xs text-white/50 mt-1">Accès complet à la nef monumentale et aux collections du musée de 20h00 à 02h30.</span>
@@ -245,12 +297,7 @@ export default function BilletterieCheckout() {
                   </div>
                 </div>
 
-                <div 
-                  onClick={() => { setProductType("tribu"); setTicketQty(1); }}
-                  className={`p-4 rounded-xl border cursor-pointer flex flex-col justify-between gap-4 transition-all duration-150 ${
-                    productType === "tribu" ? "bg-white/[0.04] border-action-laser" : "bg-transparent border-white/10 hover:border-white/20"
-                  }`}
-                >
+                <div onClick={() => { setProductType("tribu"); setTicketQty(1); }} className={`p-4 rounded-xl border cursor-pointer flex flex-col justify-between gap-4 transition-all duration-150 ${productType === "tribu" ? "bg-white/[0.04] border-action-laser" : "bg-transparent border-white/10 hover:border-white/20"}`}>
                   <div className="flex flex-col">
                     <span className="font-outfit font-bold text-sm text-white">Pack Tribu (4 Personnes)</span>
                     <span className="font-inter text-xs text-white/50 mt-1">Accès simultané groupé de 20h00 à 02h30. Tarif préférentiel dégressif meublé.</span>
@@ -304,10 +351,24 @@ export default function BilletterieCheckout() {
                   </div>
                 </div>
               </div>
+
+              {/* CASE À COCHER DE CONFORMITÉ OBLIGATOIRE */}
+              <div className="mt-4 pt-4 border-t border-white/5 flex items-start gap-3">
+                <input 
+                  type="checkbox" 
+                  id="terms" 
+                  checked={acceptTerms} 
+                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 bg-black border border-white/20 rounded accent-action-neon focus:ring-0 cursor-pointer"
+                />
+                <label htmlFor="terms" className="font-inter text-[11px] text-white/60 leading-relaxed cursor-pointer select-none">
+                  J'atteste avoir pris connaissance du protocole de sécurité ERP de l'établissement : obligation de dépôt des sacs au vestiaire, présentation d'une pièce d'identité et <span className="text-white font-medium">application réglementaire de l'opercule opaque sur l'objectif caméra</span> à l'entrée.
+                </label>
+              </div>
+
               {formError && (
                 <div className="flex items-center gap-1.5 text-red-400 font-mono text-[10px] mt-1 bg-red-950/10 border border-red-900/30 p-2 rounded-lg">
-                  <AlertTriangle className="w-3.5 h-3.5" />
-                  {formError}
+                  <AlertTriangle className="w-3.5 h-3.5" /> {formError}
                 </div>
               )}
             </div>
@@ -330,34 +391,30 @@ export default function BilletterieCheckout() {
 
               <div className="flex flex-col gap-3 font-inter text-xs text-white/70 border-b border-white/5 pb-3">
                 <div className="flex justify-between items-center">
-                  <span>Pass Nocturne REBOOT (20h00 — 02h30)</span>
+                  <span>Pass Nocturne REBOOT <br/> (20h00 — 02h30)</span>
                   <span className="text-white font-mono font-medium">{UNIT_PRICE.toFixed(2)} € x {ticketQty * multiplier}</span>
                 </div>
                 {isPassCultureApplied && (
                   <div className="flex justify-between items-center text-action-neon font-medium text-[11px]">
-                    <span>Subvention Pass Culture validée</span>
-                    <span>-{rawTotal.toFixed(2)} €</span>
+                    <span>Subvention Pass Culture validée</span> <span>-{rawTotal.toFixed(2)} €</span>
                   </div>
                 )}
               </div>
 
-              {/* INTEGRATION INTERFACE CONFIG PASS CULTURE MOBILE SECURE */}
+              {/* INTEGRATION PASS CULTURE */}
               <div className="flex flex-col gap-2 bg-white/[0.02] border border-white/5 p-4 rounded-xl">
                 <span className="font-montserrat text-[9px] uppercase tracking-wider text-white/50 font-bold block">Bénéficiaire du Pass Culture (18-24 ans)</span>
                 {!isPassCultureApplied ? (
                   <div className="flex flex-col gap-1.5">
-                    <p className="text-[11px] text-white/60 leading-relaxed">
-                      Saisissez votre code d'allocation pour neutraliser le montant de la transaction.
-                    </p>
+                    <p className="text-[11px] text-white/60 leading-relaxed">Saisissez votre code d'allocation pour neutraliser le montant de la transaction.</p>
                     <div className="flex gap-2 w-full mt-1">
                       <input type="text" value={passCultureCode} onChange={(e) => setPassCultureCode(e.target.value.toUpperCase())} placeholder="RBT-XXXXX" className="bg-black border border-white/10 rounded-xl px-3 py-2 text-xs font-mono uppercase focus:border-action-neon outline-none flex-1 min-w-0 text-white" />
                       <button type="button" onClick={handleApplyPassCulture} className="bg-white text-black hover:bg-action-neon text-xs font-inter font-bold px-4 rounded-xl transition-colors duration-150 shrink-0 select-none">Appliquer</button>
                     </div>
                     {passCultureError && (
                       <div className="flex items-center gap-1 text-red-400 font-mono text-[10px] mt-1">
-                        <AlertTriangle className="w-3 h-3" />
-                        {passCultureError}
-                    </div>
+                        <AlertTriangle className="w-3 h-3" /> {passCultureError}
+                      </div>
                     )}
                   </div>
                 ) : (
@@ -378,7 +435,6 @@ export default function BilletterieCheckout() {
                 </span>
               </div>
 
-              {/* ACTION BUTTON RESSERRÉ SUR MOBILE */}
               <button
                 onClick={handleInitiatePayment}
                 className={`w-full font-inter font-bold text-xs uppercase tracking-widest py-4 rounded-xl transition-all duration-150 flex items-center justify-center gap-2 select-none ${
@@ -386,136 +442,87 @@ export default function BilletterieCheckout() {
                 }`}
               >
                 {isPassCultureApplied ? (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    Confirmer via Pass Culture
-                  </>
+                  <><Sparkles className="w-4 h-4" /> Confirmer via Pass Culture</>
                 ) : (
-                  <>
-                    <CreditCard className="w-4 h-4" />
-                    <span className="inline sm:hidden">Apple Pay</span>
-                    <span className="hidden sm:inline">Procéder au paiement Apple Pay</span>
-                  </>
+                  <><CreditCard className="w-4 h-4" /><span className="inline sm:hidden">Apple Pay</span><span className="hidden sm:inline">Procéder au paiement Apple Pay</span></>
                 )}
               </button>
-            </div>
-
-            <div className="bg-[#050505] border border-white/5 rounded-xl p-3 flex justify-between items-center text-[10px] font-mono text-white/40 uppercase tracking-wider px-4">
-              <div className="flex items-center gap-1.5"><Lock className="w-3 h-3 text-action-neon" /><span>Stripe Secure</span></div>
-              <div className="flex items-center gap-1.5"><ShieldCheck className="w-3 h-3 text-action-neon" /><span>Conforme RGPD</span></div>
             </div>
           </div>
         </div>
       </div>
 
       {/* ==========================================
-          VÉRITABLE COPIE INTERFACE APPLE PAY SYSTEME (iOS)
+          INTERFACE APPLE PAY SYSTEME (iOS)
          ========================================== */}
       <AnimatePresence>
         {isApplePayOpen && (
           <div className="fixed inset-0 z-[1000] flex items-end justify-center bg-black/60 backdrop-blur-xs">
             <div className="absolute inset-0 bg-transparent" onClick={() => !isProcessing && setIsApplePayOpen(false)} />
 
-            {/* iOS System Sheet Framework */}
-            <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 30, stiffness: 240 }}
-              className="w-full max-w-lg bg-[#1C1C1E] text-white rounded-t-2xl p-5 z-10 font-sans border-t border-white/10 shadow-[0_-8px_30px_rgba(0,0,0,0.6)] relative flex flex-col pb-8"
-            >
-              
-              {/* LIGNE DE REPÈRE / HARDWARE BUTTON INDICATOR (PROMPT DOUBLE-CLIC) */}
+            <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} transition={{ type: "spring", damping: 30, stiffness: 240 }} className="w-full max-w-lg bg-[#1C1C1E] text-white rounded-t-2xl p-5 z-10 font-sans border-t border-white/10 shadow-[0_-8px_30px_rgba(0,0,0,0.6)] relative flex flex-col pb-8">
               <div className="absolute right-0 top-20 w-1 h-14 bg-white/40 rounded-l-md hidden md:block" />
 
-              {/* Apple Pay Sheet Top bar */}
               <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                <div className="flex items-center gap-1 text-sm font-semibold tracking-tight text-white/90">
-                  <span className="font-medium text-white">Apple Pay</span>
-                </div>
-                <button 
-                  onClick={() => !isProcessing && setIsApplePayOpen(false)}
-                  className="text-xs font-medium text-neutral-400 hover:text-white bg-white/5 px-2.5 py-1 rounded-full transition-colors"
-                  disabled={applePayStage === "processing"}
-                >
-                  Annuler
-                </button>
+                <span className="font-semibold text-white text-sm">Apple Pay</span>
+                <button onClick={() => !isProcessing && setIsApplePayOpen(false)} className="text-xs font-medium text-neutral-400 bg-white/5 px-2.5 py-1 rounded-full" disabled={applePayStage === "processing"}>Annuler</button>
               </div>
 
               {applePayStage === "review" && (
                 <div className="flex flex-col gap-1">
-                  
-                  {/* Ligne 1 : Choix de Carte (Style Apple Wallet) */}
-                  <div className="flex justify-between items-center py-3.5 border-b border-white/5 hover:bg-white/[0.02] px-1 cursor-pointer transition-colors group">
+                  <div className="flex justify-between items-center py-3.5 border-b border-white/5 hover:bg-white/[0.02] px-1 cursor-pointer group">
                     <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider w-20">Carte</span>
                     <div className="flex items-center gap-3 flex-1 justify-end">
-                      <div className="w-8 h-5 bg-gradient-to-br from-indigo-900 to-black rounded border border-white/10 flex items-center justify-center text-[7px] font-black tracking-tighter text-white">VISA</div>
-                      <span className="text-xs font-mono font-medium text-neutral-200">Banque Populaire (•••• 8892)</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-neutral-500 group-hover:text-white" />
+                      <div className="w-8 h-5 bg-gradient-to-br from-indigo-900 to-black rounded border border-white/10 flex items-center justify-center text-[7px] font-black text-white">VISA</div>
+                      <span className="text-xs text-neutral-200">Banque Populaire (•••• 8892)</span> <ChevronRight className="w-3.5 h-3.5 text-neutral-500" />
                     </div>
                   </div>
 
-                  {/* Ligne 2 : Identité & Lieu d'envoi */}
-                  <div className="flex justify-between items-start py-3.5 border-b border-white/5 hover:bg-white/[0.02] px-1 cursor-pointer transition-colors group">
+                  <div className="flex justify-between items-start py-3.5 border-b border-white/5 hover:bg-white/[0.02] px-1 cursor-pointer group">
                     <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider w-20 pt-0.5">Facturation</span>
                     <div className="flex items-center gap-3 flex-1 justify-end text-right">
                       <div className="flex flex-col text-xs">
                         <span className="font-semibold text-white uppercase">{lastName} {firstName}</span>
                         <span className="text-neutral-400 text-[11px] mt-0.5">{email}</span>
                       </div>
-                      <ChevronRight className="w-3.5 h-3.5 text-neutral-500 group-hover:text-white" />
+                      <ChevronRight className="w-3.5 h-3.5 text-neutral-500" />
                     </div>
                   </div>
 
-                  {/* Ligne 3 : Organisme de prélèvement */}
                   <div className="flex justify-between items-center py-3.5 border-b border-white/5 px-1">
                     <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider w-20">Marchand</span>
                     <span className="text-xs font-medium text-white">REBOOT TOULOUSE</span>
                   </div>
 
-                  {/* Ligne 4 : Montant Comptable arrêté */}
                   <div className="flex justify-between items-center py-4 px-1 mt-2">
                     <span className="text-xs font-bold text-neutral-300 uppercase tracking-wider">PAYER</span>
-                    <span className="text-2xl font-semibold font-mono text-white tracking-tight">{finalTotal.toFixed(2)} €</span>
+                    <span className="text-2xl font-semibold font-mono text-white">{finalTotal.toFixed(2)} €</span>
                   </div>
 
-                  {/* HARDWARE SIMULATION INSTRUCTIONS */}
                   <div className="mt-2 p-1 relative flex flex-col items-center">
-                    <motion.button
-                      whileTap={{ scale: 0.98 }}
-                      onClick={triggerApplePayBiometrics}
-                      className="w-full bg-white hover:bg-neutral-200 text-black py-4 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg cursor-pointer select-none"
-                    >
-                      <Fingerprint className="w-4 h-4" />
-                      Confirmer avec Face ID
-                    </motion.button>
-                    <span className="text-[10px] text-neutral-500 text-center mt-2 font-mono uppercase tracking-wider">
-                      Double-cliquez sur le bouton latéral pour valider
-                    </span>
+                    <button onClick={triggerApplePayBiometrics} className="w-full bg-white text-black py-4 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 select-none">
+                      <Fingerprint className="w-4 h-4" /> Confirmer avec Face ID
+                    </button>
+                    <span className="text-[10px] text-neutral-500 text-center mt-2 font-mono uppercase tracking-wider">Double-cliquez sur le bouton latéral pour valider</span>
                   </div>
                 </div>
               )}
 
               {applePayStage === "authenticating" && (
                 <div className="py-14 flex flex-col items-center justify-center gap-4 text-center">
-                  <motion.div 
-                    animate={{ scale: [1, 1.08, 1], opacity: [0.8, 1, 0.8] }}
-                    transition={{ repeat: Infinity, duration: 1 }}
-                    className="w-16 h-16 bg-action-neon/10 border border-action-neon/50 rounded-full flex items-center justify-center text-action-neon shadow-[0_0_30px_rgba(209,255,0,0.15)]"
-                  >
+                  <motion.div animate={{ scale: [1, 1.08, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="w-16 h-16 bg-action-neon/10 border border-action-neon/50 rounded-full flex items-center justify-center text-action-neon">
                     <Fingerprint className="w-8 h-8" />
                   </motion.div>
-                  <span className="text-xs font-medium tracking-wide text-neutral-300 animate-pulse">Vérification Face ID...</span>
+                  <span className="text-xs text-neutral-300 animate-pulse">Vérification Face ID...</span>
                 </div>
               )}
 
               {applePayStage === "processing" && (
                 <div className="py-14 flex flex-col items-center justify-center gap-4 text-center">
                   <div className="w-8 h-8 border-2 border-neutral-600 border-t-white rounded-full animate-spin" />
-                  <span className="text-xs font-medium tracking-wide text-neutral-400">Chiffrement de la clé de transaction...</span>
+                  <span className="text-xs text-neutral-400">Chiffrement de la transaction...</span>
                 </div>
               )}
-
             </motion.div>
           </div>
         )}

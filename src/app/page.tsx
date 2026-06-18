@@ -4,21 +4,22 @@ import ExperienceReboot from "@/components/sections/ExperienceReboot";
 import CollectionsReboot from "@/components/sections/CollectionsReboot";
 import FomoReboot from "@/components/sections/FomoReboot";
 import LogisticsReboot from "@/components/sections/LogisticsReboot";
+import FaqReboot from "@/components/sections/FaqReboot";
 import FloatingCTA from "@/components/ui/FloatingCTA";
-import Chatbot from "@/components/ui/Chatbot";
 
-export default function RebootPage() {
+export default function Home() {
   return (
-    <main className="bg-[#000000] min-h-screen relative pb-32">
+    <main className="min-h-screen bg-black overflow-x-hidden antialiased relative">
       <HeroReboot />
       <ManifestoReboot />
       <ExperienceReboot />
       <CollectionsReboot />
       <FomoReboot />
       <LogisticsReboot />
+      <FaqReboot />
       
+      {/* Activation du CTA global sur la Landing Page */}
       <FloatingCTA />
-      <Chatbot />
     </main>
   );
 }
