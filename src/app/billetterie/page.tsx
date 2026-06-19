@@ -18,7 +18,7 @@ export default function BilletterieCheckout() {
   const [formError, setFormError] = useState("");
   
   // Module de temporisation du panier (CRO / Scarcity Benchmark)
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes en secondes
+  const [timeLeft, setTimeLeft] = useState(600); 
   const [isCartExpired, setIsCartExpired] = useState(false);
   
   // Interfaçage Pass Culture 
@@ -32,6 +32,10 @@ export default function BilletterieCheckout() {
   const [applePayStage, setApplePayStage] = useState<"review" | "authenticating" | "processing">("review");
   const [isSuccess, setIsSuccess] = useState(false);
   const [orderId, setOrderId] = useState("");
+
+  // États pour la capture e-mail CRM dans la vue succès
+  const [crmEmail, setCrmEmail] = useState("");
+  const [isCrmSubscribed, setIsCrmSubscribed] = useState(false);
 
   // Gestion du compte à rebours
   useEffect(() => {
@@ -129,6 +133,11 @@ export default function BilletterieCheckout() {
       setApplePayStage("processing");
       executeFinalProcessing();
     }, 1500);
+  };
+
+  const handleCrmSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (crmEmail) setIsCrmSubscribed(true);
   };
 
   // ==========================================
@@ -237,6 +246,39 @@ export default function BilletterieCheckout() {
             </div>
           </div>
 
+          {/* AJOUT EXTENSION : Capture CRM harmonisée sous la fiche de caisse */}
+          <div className="bg-[#050505] border border-white/10 rounded-2xl p-5 flex flex-col items-start text-left gap-3 shadow-xl">
+            <span className="font-outfit font-bold text-base uppercase tracking-tight text-white">
+              Ne ratez pas le prochain drop
+            </span>
+            <p className="font-inter text-xs text-white/50 leading-relaxed">
+              La jauge est toujours limitée. Soyez averti 24h avant l'ouverture de la prochaine billetterie.
+            </p>
+
+            {!isCrmSubscribed ? (
+              <form onSubmit={handleCrmSubscribe} className="flex w-full gap-2 mt-1">
+                <input 
+                  type="email" 
+                  placeholder="VOTRE E-MAIL" 
+                  required
+                  value={crmEmail}
+                  onChange={(e) => setCrmEmail(e.target.value)}
+                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 font-inter text-xs focus:outline-none focus:border-action-neon transition-colors placeholder:text-white/30 text-white"
+                />
+                <button 
+                  type="submit"
+                  className="bg-action-neon text-black px-5 py-2.5 rounded-xl font-inter font-bold text-xs uppercase tracking-wider flex items-center justify-center hover:bg-white transition-colors shrink-0"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </form>
+            ) : (
+              <div className="w-full bg-action-laser/10 border border-action-laser/30 text-action-laser py-3 rounded-xl font-inter text-xs font-bold tracking-widest uppercase text-center mt-1">
+                Alerte activée
+              </div>
+            )}
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-3 w-full">
             <button onClick={() => alert("Pass REBOOT ajouté avec succès.")} className="flex-1 bg-white hover:bg-neutral-200 text-black py-3 rounded-xl font-inter font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors select-none">
               <Download className="w-4 h-4" /> Ajouter au Wallet
@@ -250,6 +292,9 @@ export default function BilletterieCheckout() {
     );
   }
 
+  // ==========================================
+  // VUE BANALE DU TICKET TUNNEL (INCHANGÉE)
+  // ==========================================
   return (
     <div className="min-h-screen bg-[#000000] text-white pt-20 md:pt-12 pb-16 px-4 sm:px-6 md:px-12 lg:px-24">
       <div className="max-w-6xl mx-auto">
@@ -265,7 +310,6 @@ export default function BilletterieCheckout() {
             </h1>
           </div>
           
-          {/* COMPTE À REBOURS CRYPTIQUE (CRO ACCÉLÉRATEUR) */}
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-action-laser/10 border border-action-laser/30 self-start md:self-auto font-mono text-xs text-white">
             <Clock className="w-4 h-4 text-action-laser animate-pulse" />
             <span>Places réservées pendant :</span>
@@ -352,7 +396,6 @@ export default function BilletterieCheckout() {
                 </div>
               </div>
 
-              {/* CASE À COCHER DE CONFORMITÉ OBLIGATOIRE */}
               <div className="mt-4 pt-4 border-t border-white/5 flex items-start gap-3">
                 <input 
                   type="checkbox" 
@@ -401,7 +444,6 @@ export default function BilletterieCheckout() {
                 )}
               </div>
 
-              {/* INTEGRATION PASS CULTURE */}
               <div className="flex flex-col gap-2 bg-white/[0.02] border border-white/5 p-4 rounded-xl">
                 <span className="font-montserrat text-[9px] uppercase tracking-wider text-white/50 font-bold block">Bénéficiaire du Pass Culture (18-24 ans)</span>
                 {!isPassCultureApplied ? (
@@ -452,9 +494,6 @@ export default function BilletterieCheckout() {
         </div>
       </div>
 
-      {/* ==========================================
-          INTERFACE APPLE PAY SYSTEME (iOS)
-         ========================================== */}
       <AnimatePresence>
         {isApplePayOpen && (
           <div className="fixed inset-0 z-[1000] flex items-end justify-center bg-black/60 backdrop-blur-xs">
